@@ -3,6 +3,7 @@
 from flask import Flask
 from sqlalchemy.engine import create_engine
 import pandas as pd
+import cx_Oracle
 
 app = Flask(__name__)
 
@@ -20,6 +21,7 @@ engine = create_engine(ENGINE_PATH_WIN_AUTH)
 
 #test query
 test_df = pd.read_sql_query('SELECT * FROM tbl_member', engine)
+# insert_sql_result = engine.execute('INSERT ')
 #
 
 # temp code --> 모델 불러오기
