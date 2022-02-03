@@ -26,6 +26,7 @@ test_df = pd.read_sql_query('SELECT * FROM tbl_member', engine)
 
 # temp code --> 모델 불러오기
 # 1. 불러온 모델로 결과값을 변수에 저장.
+# gii test
 #model = torch.load('model_kobert.pt')
 
 # result = model.eval()
