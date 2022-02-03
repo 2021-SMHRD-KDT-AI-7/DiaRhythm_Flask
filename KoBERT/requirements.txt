@@ -1,0 +1,7 @@
+boto3
+gluonnlp
+mxnet
+onnxruntime
+sentencepiece
+torch
+transformers

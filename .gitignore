@@ -1,2 +1,4 @@
 # created by virtualenv automatically
 
+/Lib/site-packages/torch/
+./model_state_dict.pt
