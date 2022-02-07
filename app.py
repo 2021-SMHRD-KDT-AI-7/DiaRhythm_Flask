@@ -140,3 +140,6 @@ port_num = 80
 #파이썬 명령어로 실행할 수 있음
 if __name__ == '__main__':
     app.run(host=host_addr, port=port_num,  debug=True)
+
+
+    # 명재 깃 on
