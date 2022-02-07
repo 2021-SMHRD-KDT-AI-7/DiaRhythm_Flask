@@ -1,6 +1,7 @@
 # app.py
 
 from flask import Flask
+from flask import request, redirect
 from sqlalchemy.engine import create_engine
 import pandas as pd
 import cx_Oracle
@@ -33,6 +34,7 @@ SERVICE = 'xe' # enter the oracle db service name
 ENGINE_PATH_WIN_AUTH = DIALECT + '+' + SQL_DRIVER + '://' + USERNAME + ':' + PASSWORD +'@' + HOST + ':' + str(PORT) + '/?service_name=' + SERVICE
 
 engine = create_engine(ENGINE_PATH_WIN_AUTH)
+
 
 # temp code --> 모델 불러오기
 # CPU
@@ -110,33 +112,57 @@ def testModel(model, seq):
     idx = result.argmax().cpu().item()
     # print("신뢰도는:", "{:.2f}%".format(softmax(result,idx)))
     return cate[idx]
-#
 
-@app.route("/")
-def hello_world():
+@app.route("/emotions", methods=['GET','POST'])
+def emotion():
     # 2. 여기가 홈페이지에서 보이는 부분.
     # 이클립스 서블릿이 안만들어져 있으니깐 여기서 표시하는건 단순한 String만 가능!
     # 1번에서 저장했던 변수에 .to_string() 을 써서 String 출력
 
-    # return result.to_string()
+    if request.method == 'POST':
+        # 안드로이드에서 getParams()메소드 안에 작성한
+        # parsms.put("num1", "데이터1");
+        # params.put("num2", "데이터2");
+        # 의 key값인 num1, num2를 통해서 데이터 접근하여 변수에 저장
+        title = request.form['num1']
+        content = request.form['num2']
+        id = request.form['num3']
 
-    model.load_state_dict(torch.load('model_state_dict.pt', map_location=device))
-    model.to(device)
-    model.eval()
-    result = testModel(model, "자꾸 날 짜증나게 만든다.. 증말 화가난다.. 열받네ㅠ")
-    print(result)
+        # num2 = int(request.form['num2'])
 
-    # DB 에 값넣는 파트
-    insert_sql_result = engine.execute('INSERT INTO ')
-    #
+        model.load_state_dict(torch.load('model_state_dict.pt', map_location=device))
+        model.to(device)
+        model.eval()
 
-    # 안드에 분석 결과 리턴
-    return result
+        # chatModel load
 
-#host_addr = 'project-db-stu.ddns.net'
-host_addr = 'localhost'
+
+        # 딥러닝 모델을 함수로 구현한 후 결과값을 return하여 result변수에 저장
+        # 딥러닝 모델은 아래 Cell에 만들 것
+        result = testModel(model, content)
+        # result2 = chatModel(charmodel, content)
+
+        print(title)
+        print(content)
+        print(id)
+        print(result)
+
+        # DB 에 값넣는 파트
+        s_vals = f"('{title}','{content}','{id}','{result}')"
+        insert_sql_result = engine.execute(f"INSERT INTO TBL_DIARY (D_TITLE, D_CONTENT, M_ID, DEEP_EMOTION) VALUES {s_vals}")
+
+        print(insert_sql_result)
+        # 결과값 리턴하면 안드로이드 스튜디오 StringRequest 안에 있는 onResponse()로 값 전달
+        return result
+
+
+
+
+
+# host_addr = 'project-db-stu.ddns.net'
+host_addr = '121.147.52.194'
 port_num = 80
 
-#파이썬 명령어로 실행할 수 있음
+# 파이썬 명령어로 실행할 수 있음
 if __name__ == '__main__':
     app.run(host=host_addr, port=port_num,  debug=True)
